@@ -1,5 +1,6 @@
 
 import streamlit as st
+import numpy as np
 import openai
 
 # Streamlit Community Cloudの「Secrets」からOpenAI API keyを取得
