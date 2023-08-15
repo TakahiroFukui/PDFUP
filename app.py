@@ -43,9 +43,9 @@ def communicate():
 
 
 # ユーザーインターフェイスの構築
-st.title("福井家の「プログラミング講師」")
+st.title("論文要約アプリ")
 st.image("04_programming.png")
-st.write("プログラミングに関して、何でも聞いてください。")
+st.write("論文をアップロードしてください")
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
