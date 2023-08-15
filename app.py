@@ -47,8 +47,7 @@ def communicate():
 st.title("論文要約アプリ")
 st.write("論文をアップロードしてください")
 
-def get_pdf_text():
-    uploaded_file = st.file_uploader(　label='Upload your PDF here😇',　type='pdf')
+uploaded_file = st.file_uploader("ファイルを選択してください", type=['pdf'])
     
     if uploaded_file:
         pdf_reader = PdfReader(uploaded_file)
