@@ -44,12 +44,13 @@ def communicate():
     st.session_state["user_input"] = ""  # 入力欄を消去
 
 # テキスト抽出
-file = pdf_path  # pdf_path is now a BytesIO object
-reader = PyPDF2.PdfReader(file)
-text = ""
-for page_num in range(len(reader.pages)):
-    page = reader.pages[page_num]
-    text += page.extract_text()
+def textextract():
+    file = pdf_path  # pdf_path is now a BytesIO object
+    reader = PyPDF2.PdfReader(file)
+    text = ""
+    for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        text += page.extract_text()
     return text
 
 
