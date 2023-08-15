@@ -60,6 +60,25 @@ if uploaded_file is not None:
     string_data = stringio.read()
     st.write(string_data)
 
+def extract_text_from_pdf(pdf_path):
+    """PDFファイルからテキストを抽出する。
+    
+    Args:
+    - pdf_path (str): PDFファイルへのパス。
+    
+    Returns:
+    - str: PDFから抽出されたテキスト。
+    """
+    import PyPDF2
+    
+    file = pdf_path  # pdf_path is now a BytesIO object
+    reader = PyPDF2.PdfReader(file)
+    text = ""
+    for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        text += page.extract_text()
+    return text
+
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
