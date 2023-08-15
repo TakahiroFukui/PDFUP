@@ -2,9 +2,6 @@
 import streamlit as st
 import openai
 
-
-
-
 # Streamlit Community Cloudの「Secrets」からOpenAI API keyを取得
 openai.api_key = st.secrets.OpenAIAPI.openai_api_key
 
@@ -71,6 +68,7 @@ def extract_text_from_pdf(pdf_path):
         text += page.extract_text()
     return text
 
+print(text)
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
