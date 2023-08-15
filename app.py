@@ -54,7 +54,7 @@ def textextract():
 st.title("論文要約アプリ")
 
 uploaded_file = st.file_uploader("論文をアップロードしてください", type=['pdf'])
-st.write(text)
+
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
