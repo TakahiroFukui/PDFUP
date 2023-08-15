@@ -2,6 +2,7 @@
 import streamlit as st
 import numpy as np
 import openai
+import PyPDF2
 
 # Streamlit Community Cloudの「Secrets」からOpenAI API keyを取得
 openai.api_key = st.secrets.OpenAIAPI.openai_api_key
@@ -41,6 +42,15 @@ def communicate():
     messages.append(bot_message)
 
     st.session_state["user_input"] = ""  # 入力欄を消去
+
+# テキスト抽出
+file = pdf_path  # pdf_path is now a BytesIO object
+    reader = PyPDF2.PdfReader(file)
+    text = ""
+    for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        text += page.extract_text()
+    return text
 
 
 # ユーザーインターフェイスの構築
