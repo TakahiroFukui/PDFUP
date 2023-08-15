@@ -52,9 +52,9 @@ def textextract():
 
 # ユーザーインターフェイスの構築
 st.title("論文要約アプリ")
-st.write("論文をアップロードしてください")
 
-uploaded_file = st.file_uploader("ファイルを選択してください", type=['pdf'])
+uploaded_file = st.file_uploader("論文をアップロードしてください", type=['pdf'])
+st.write(text)
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
