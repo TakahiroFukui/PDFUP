@@ -44,7 +44,6 @@ def communicate():
 
 # ユーザーインターフェイスの構築
 st.title("論文要約アプリ")
-st.image("04_programming.png")
 st.write("論文をアップロードしてください")
 
 file = st.file_uploader("ファイルを選択してください", type=['pdf'])
