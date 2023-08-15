@@ -48,10 +48,8 @@ st.title("論文要約アプリ")
 st.write("論文をアップロードしてください")
 
 def get_pdf_text():
-    uploaded_file = st.file_uploader(
-        label='Upload your PDF here😇',
-        type='pdf'  # アップロードを許可する拡張子 (複数設定可)
-    )
+    uploaded_file = st.file_uploader(　label='Upload your PDF here😇',　type='pdf')
+    
     if uploaded_file:
         pdf_reader = PdfReader(uploaded_file)
         text = '\n\n'.join([page.extract_text() for page in pdf_reader.pages])
