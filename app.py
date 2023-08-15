@@ -68,7 +68,6 @@ def extract_text_from_pdf(pdf_path):
         text += page.extract_text()
     return text
 
-print(text)
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
