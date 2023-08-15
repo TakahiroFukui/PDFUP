@@ -45,8 +45,8 @@ def communicate():
 
 # テキスト抽出
 file = pdf_path  # pdf_path is now a BytesIO object
-    reader = PyPDF2.PdfReader(file)
-    text = ""
+reader = PyPDF2.PdfReader(file)
+text = ""
     for page_num in range(len(reader.pages)):
         page = reader.pages[page_num]
         text += page.extract_text()
