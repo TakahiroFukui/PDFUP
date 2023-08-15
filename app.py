@@ -2,15 +2,7 @@
 import streamlit as st
 import openai
 
-uploaded_file = st.file_uploader("ファイルを選択してください", type=['pdf'])
-if uploaded_file is not None:
-    # バイトとしてファイルを読み取る場合：
-    bytes_data = uploaded_file.getvalue()
-    st.write(bytes_data)
-    
-    # 文字列としてファイルを読み取る場合：
-    string_data = stringio.read()
-    st.write(string_data)
+
 
 
 # Streamlit Community Cloudの「Secrets」からOpenAI API keyを取得
@@ -57,6 +49,17 @@ def communicate():
 st.title("論文要約アプリ")
 st.image("04_programming.png")
 st.write("論文をアップロードしてください")
+
+uploaded_file = st.file_uploader("ファイルを選択してください", type=['pdf'])
+if uploaded_file is not None:
+    # バイトとしてファイルを読み取る場合：
+    bytes_data = uploaded_file.getvalue()
+    st.write(bytes_data)
+    
+    # 文字列としてファイルを読み取る場合：
+    string_data = stringio.read()
+    st.write(string_data)
+
 
 user_input = st.text_input("メッセージを入力してください。", key="user_input", on_change=communicate)
 
