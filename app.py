@@ -20,7 +20,6 @@ system_prompt = """
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
         {"role": "system", "content": system_prompt}
-        {"role": "system", "content": text}
         ]
 
 # チャットボットとやりとりする関数
