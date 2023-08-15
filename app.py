@@ -47,10 +47,10 @@ def communicate():
 file = pdf_path  # pdf_path is now a BytesIO object
 reader = PyPDF2.PdfReader(file)
 text = ""
-    for page_num in range(len(reader.pages)):
-        page = reader.pages[page_num]
-        text += page.extract_text()
-    return text
+for page_num in range(len(reader.pages)):
+    page = reader.pages[page_num]
+    text += page.extract_text()
+return text
 
 
 # ユーザーインターフェイスの構築
