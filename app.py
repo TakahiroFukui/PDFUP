@@ -49,7 +49,7 @@ def textextract():
         page = reader.pages[page_num]
         text += page.extract_text()
     return text
-
+print(text)
 
 # ユーザーインターフェイスの構築
 st.title("論文要約アプリ")
