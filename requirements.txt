@@ -5,4 +5,4 @@ numpy
 pandas
 matplotlib
 chainlit
-langchain
+langchain==0.0.257
