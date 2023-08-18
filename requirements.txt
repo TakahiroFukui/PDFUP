@@ -1,3 +1,4 @@
+Django==23.2.1
 streamlit==1.20.0
 openai
 PyPDF2
