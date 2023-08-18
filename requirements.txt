@@ -4,6 +4,7 @@ PyPDF2
 numpy
 pandas
 matplotlib
-langchain.callbacks
+os
+shutil
+chainlit
 langchain
-dqdrant_client
