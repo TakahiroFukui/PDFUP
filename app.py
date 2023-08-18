@@ -1,6 +1,7 @@
 # 必要なモジュールの読み込み
 import os
 import shutil
+import openai
 from PyPDF2 import PdfReader
 import chainlit as cl
 import streamlit as st
