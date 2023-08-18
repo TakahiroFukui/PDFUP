@@ -1,10 +1,9 @@
-streamlit==1.20.0
+streamlit
 openai
 PyPDF2
 numpy
 pandas
 matplotlib
-os
 shutil
 chainlit
 langchain
