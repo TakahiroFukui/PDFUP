@@ -3,6 +3,7 @@ import os
 import shutil
 from PyPDF2 import PdfReader
 import chainlit as cl
+import streamlit as st
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
