@@ -4,6 +4,5 @@ PyPDF2
 numpy
 pandas
 matplotlib
-shutil
 chainlit
 langchain
