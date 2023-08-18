@@ -7,3 +7,4 @@ pandas
 matplotlib
 langchain.callbacks
 langchain
+dqdrant_client
