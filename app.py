@@ -1,116 +1,66 @@
-import streamlit as st
-from langchain.callbacks import get_openai_callback
-
+# 必要なモジュールの読み込み
+import os
+import shutil
 from PyPDF2 import PdfReader
+import chainlit as cl
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Qdrant
-
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
-
-QDRANT_PATH = "./local_qdrant"
-COLLECTION_NAME = "my_collection"
-
-
-def init_page():
-    st.set_page_config(
-        page_title="Ask My PDF(s)",
-        page_icon="🤗"
+from langchain.vectorstores import Chroma
+from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.chat_models import ChatOpenAI
+# 定数設定
+OPENAI_API_KEY = "<OpenAI APIキー>"
+TEMP_PDF_PATH = "./doc/doc.pdf"
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 10
+DB_PATH = './.chroma'
+MODEL_NAME = "gpt-3.5"
+# Streamlit Community Cloudの「Secrets」からOpenAI API keyを取得
+openai.api_key = st.secrets.OpenAIAPI.openai_api_key
+# PDFファイルを開いてテキストを抽出する関数
+async def process_pdf(file):
+    file = file[0] if isinstance(file, list) else file
+    with open(TEMP_PDF_PATH, 'wb') as f:
+        f.write(file.content)
+    reader = PdfReader(TEMP_PDF_PATH)
+    return ''.join(page.extract_text() for page in reader.pages)
+# テキストを分割し、埋め込みを作成してデータベースを作成する関数
+async def create_db(text):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
+    docs = text_splitter.split_text(text)
+    metadatas = [{"source": f"{i}-pl"} for i in range(len(docs))]
+    embeddings = OpenAIEmbeddings()
+    db = Chroma.from_texts(docs, embeddings, metadatas=metadatas)
+    return db, docs
+# チャットボットの初期化処理
+@cl.langchain_factory(use_async=True)
+async def init():
+    file = None
+    while file is None:
+        file = await cl.AskFileMessage(content="PDFファイルをアップロードしてください！", accept=["pdf"]).send()
+    # データベースの初期化
+    shutil.rmtree(DB_PATH, ignore_errors=True)
+    # ファイルからテキストを抽出し、データベースを作成
+    text = await process_pdf(file)
+    db, docs = await create_db(text)
+    chain = RetrievalQAWithSourcesChain.from_chain_type(
+        ChatOpenAI(model=MODEL_NAME,temperature=0),
+        chain_type="stuff",
+        retriever=db.as_retriever(),
     )
-    st.sidebar.title("Nav")
-    st.session_state.costs = []
-
-
-def get_pdf_text():
-    uploaded_file = st.file_uploader(
-        label='Upload your PDF here😇',
-        type='pdf'
-    )
-    if uploaded_file:
-        pdf_reader = PdfReader(uploaded_file)
-        text = '\n\n'.join([page.extract_text() for page in pdf_reader.pages])
-        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-            model_name=st.session_state.emb_model_name,
-            # 適切な chunk size は質問対象のPDFによって変わるため調整が必要
-            # 大きくしすぎると質問回答時に色々な箇所の情報を参照することができない
-            # 逆に小さすぎると一つのchunkに十分なサイズの文脈が入らない
-            chunk_size=250,
-            chunk_overlap=0,
-        )
-        return text_splitter.split_text(text)
-    else:
-        return None
-
-
-def load_qdrant():
-    client = QdrantClient(path=QDRANT_PATH)
-
-    # すべてのコレクション名を取得
-    collections = client.get_collections().collections
-    collection_names = [collection.name for collection in collections]
-
-    # コレクションが存在しなければ作成
-    if COLLECTION_NAME not in collection_names:
-        # コレクションが存在しない場合、新しく作成します
-        client.create_collection(
-            collection_name=COLLECTION_NAME,
-            vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
-        )
-        print('collection created')
-
-    return Qdrant(
-        client=client,
-        collection_name=COLLECTION_NAME, 
-        embeddings=OpenAIEmbeddings()
-    )
-
-
-def build_vector_store(pdf_text):
-    qdrant = load_qdrant()
-    qdrant.add_texts(pdf_text)
-
-    # 以下のようにもできる。この場合は毎回ベクトルDBが初期化される
-    # LangChain の Document Loader を利用した場合は `from_documents` にする
-    # Qdrant.from_texts(
-    #     pdf_text,
-    #     OpenAIEmbeddings(),
-    #     path="./local_qdrant",
-    #     collection_name=COLLECTION_NAME,
-    # )
-
-
-def page_pdf_upload_and_build_vector_db():
-    st.title("PDF Upload")
-    container = st.container()
-    with container:
-        pdf_text = get_pdf_text()
-        if pdf_text:
-            with st.spinner("Loading PDF ..."):
-                build_vector_store(pdf_text)
-
-
-def page_ask_my_pdf():
-    st.title("Ask My PDF(s)")
-    st.write('Under Construction')
-
-    # 後で実装する
-
-
-def main():
-    init_page()
-
-    selection = st.sidebar.radio("Go to", ["PDF Upload", "Ask My PDF(s)"])
-    if selection == "PDF Upload":
-        page_pdf_upload_and_build_vector_db()
-    elif selection == "Ask My PDF(s)":
-        page_ask_my_pdf()
-
-    costs = st.session_state.get('costs', [])
-    st.sidebar.markdown("## Costs")
-    st.sidebar.markdown(f"**Total cost: ${sum(costs):.5f}**")
-    for cost in costs:
-        st.sidebar.markdown(f"- ${cost:.5f}")
+    # テキストをユーザーセッションに保存
+    cl.user_session.set("texts", docs)
+    file_name = file[0].name if isinstance(file, list) else file.name
+    await cl.Message(content=f"`{file_name}` の準備が完了しました！").send()
+    return chain
+# 応答を処理する関数
+@cl.langchain_postprocess
+def process_response(res):
+    texts = cl.user_session.get("texts")
+    sources = res["sources"].strip().split(',')
+    source_elements = [cl.Text(content=texts[int(s[:s.find('-pl')])], name=s) for s in sources if s]
+    response = f"{res['answer']} 出典: {res['sources']}"
+    cl.Message(content=response, elements=source_elements).send()
 
 if __name__ == '__main__':
     main()
